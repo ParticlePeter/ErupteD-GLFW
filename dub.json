@@ -1,0 +1,15 @@
+{
+	"name"			:	"erupted-glfw",
+	"targetName"	:	"ErupteD-GLFW",
+	"targetType"	:	"executable",
+	"description"	:	"D Creative Coding",
+	"homepage"		:	"",
+	"copyright"		:	"Copyright (c) 2016, Peter Particle",
+	"authors"		:	[ "Peter Particle" ],
+	"license"		: 	"MIT",
+
+	"dependencies"		:	{
+		"erupted"			:	"~>1.3.2",
+		"derelict-glfw3"	:	"~>2.0.0",
+	},
+}
