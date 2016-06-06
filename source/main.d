@@ -8,7 +8,7 @@ import std.conv;
 import std.string;
 
 import erupted;
-import vulkan_glfw3;
+import derelict.glfw3;
 
 
 private void enforceVK(VkResult res) {
@@ -21,11 +21,20 @@ extern( C ) void key_callback( GLFWwindow * window, int key, int scancode, int v
 	}
 }
 
+// this template brings vulkan support function definitions into current scope
+// hence these functions can be used with erupted vulkan types
+mixin DerelictGLFW3_VulkanBind;
+
 
 int main() {
 
-	// load global level functions 
-	VulkanGLFW3.load();
+	// load GLFW3 functions 
+	DerelictGLFW3.load;
+
+	// load GLFW3 vulkan support functions into current scope
+	DerelictGLFW3_loadVulkan();
+
+	// initialize glfw
 	glfwInit();
 
 	// check if Vulkan is available on this machine
@@ -51,7 +60,7 @@ int main() {
 	};
 	
 	// get the extensions required for for a glfw window with vulkan surface
-	uint glfwRequiredExtensionsCount;
+	uint32_t glfwRequiredExtensionsCount;
 	auto glfwRequiredExtensions = glfwGetRequiredInstanceExtensions( &glfwRequiredExtensionsCount );
 
 	// assuming that the extensions are available on this machine, but this should be checked 
@@ -85,7 +94,7 @@ int main() {
 	loadInstanceLevelFunctions( instance );
 	
 	// enumerate physical devices
-	uint numPhysDevices;
+	uint32_t numPhysDevices;
 	enforceVK(vkEnumeratePhysicalDevices(instance, &numPhysDevices, null));
 	if (numPhysDevices == 0) {
 		stderr.writeln("No physical devices available.");
@@ -114,7 +123,7 @@ int main() {
 	// for simplicity the first found physical device will be used
 
 	// enumerate queues of first physical device
-	uint numQueues;
+	uint32_t numQueues;
 	vkGetPhysicalDeviceQueueFamilyProperties(physDevices[0], &numQueues, null);
 	assert(numQueues >= 1);
 
@@ -123,7 +132,7 @@ int main() {
 	assert(numQueues >= 1);	// numQueues can be different than the first time
 
 	// find print information about queue families and find graphics queue family index
-	uint graphicsQueueFamilyIndex = uint.max;
+	uint32_t graphicsQueueFamilyIndex = uint32_t.max;
 	foreach(i, const ref properties; queueFamilyProperties) {
 		writeln("Queue Family ", i);
 		writeln("\tQueues in Family         : ", properties.queueCount);
@@ -131,8 +140,8 @@ int main() {
 
 		if (properties.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 			writeln("\tVK_QUEUE_GRAPHICS_BIT");
-			if (graphicsQueueFamilyIndex == uint.max) {
-				graphicsQueueFamilyIndex = i;
+			if (graphicsQueueFamilyIndex == uint32_t.max) {
+				graphicsQueueFamilyIndex = cast( uint32_t )i;
 			}
 		}
 
@@ -149,7 +158,7 @@ int main() {
 	}
 
 	// if no graphics queue family was found use the first available queue family
-	if (graphicsQueueFamilyIndex == uint.max)  {
+	if (graphicsQueueFamilyIndex == uint32_t.max)  {
 		writeln("VK_QUEUE_GRAPHICS_BIT not found. Using queue family index 0");
 		graphicsQueueFamilyIndex = 0;
 	} else {

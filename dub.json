@@ -10,6 +10,6 @@
 
 	"dependencies"		:	{
 		"erupted"			:	"~>1.3.2",
-		"derelict-glfw3"	:	"~>2.0.0",
+		"derelict-glfw3"	:	"~>3.1.0",
 	},
 }
